@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+	<_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+	<_locTag _loc="locData">Default</_locTag>
+</_locDefinition>
+<CodeSnippet Format="1.0.0">
+<Header>
+<Title>SimpleCursor</Title>
+<Shortcut></Shortcut>
+<Description>A one variable, fast-forward cursor.</Description>
+<Author>Ryan Redburn</Author>
+<SnippetTypes>
+	<SnippetType>Expansion</SnippetType>
+</SnippetTypes>
+</Header>
+<Snippet>
+<Declarations>
+	<Literal>
+		<ID>type</ID>
+		<Default>type</Default>
+	</Literal>
+	<Literal>
+		<ID>column</ID>
+		<Default>column</Default>
+	</Literal>
+	<Literal>
+		<ID>table</ID>
+		<Default>table</Default>
+	</Literal>
+	<Literal>
+		<ID>operation</ID>
+		<Default>operation</Default>
+	</Literal>
+</Declarations>
+<Code Language="SQL">
+<![CDATA[DECLARE @cursor_variable $type$;
+
+DECLARE simple_cursor CURSOR FAST_FORWARD
+FOR
+SELECT $column$
+FROM $table$;
+
+OPEN simple_cursor;
+
+FETCH NEXT FROM simple_cursor
+INTO @cursor_variable;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	$operation$
+
+	FETCH NEXT FROM simple_cursor
+	INTO @cursor_variable;
+END
+
+CLOSE simple_cursor;
+DEALLOCATE simple_cursor;]]>
+</Code>
+</Snippet>
+</CodeSnippet>
+</CodeSnippets>

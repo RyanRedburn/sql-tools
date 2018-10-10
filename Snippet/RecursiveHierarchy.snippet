@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+	<_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+	<_locTag _loc="locData">Default</_locTag>
+</_locDefinition>
+<CodeSnippet Format="1.0.0">
+<Header>
+<Title>RecursiveHierarchy</Title>
+<Shortcut></Shortcut>
+<Description>Select statement for querying an adjacency list style hierarchy.</Description>
+<Author>Ryan Redburn</Author>
+<SnippetTypes>
+	<SnippetType>Expansion</SnippetType>
+</SnippetTypes>
+</Header>
+<Snippet>
+<Declarations>
+	<Literal>
+		<ID>column_list</ID>
+		<Default>column_list</Default>
+	</Literal>
+	<Literal>
+		<ID>root_columns</ID>
+		<Default>root_columns</Default>
+	</Literal>
+	<Literal>
+		<ID>table_1</ID>
+		<Default>table_1</Default>
+	</Literal>
+	<Literal>
+		<ID>parent_id</ID>
+		<Default>parent_id</Default>
+	</Literal>
+	<Literal>
+		<ID>table_2</ID>
+		<Default>table_2</Default>
+	</Literal>
+	<Literal>
+		<ID>child_columns</ID>
+		<Default>child_columns</Default>
+	</Literal>
+	<Literal>
+		<ID>hierarchy_id_1</ID>
+		<Default>hierarchy_id_1</Default>
+	</Literal>
+	<Literal>
+		<ID>child_id</ID>
+		<Default>child_id</Default>
+	</Literal>
+	<Literal>
+		<ID>hierarchy_id_2</ID>
+		<Default>hierarchy_id_2</Default>
+	</Literal>
+	<Literal>
+		<ID>target_id</ID>
+		<Default>target_id</Default>
+	</Literal>
+</Declarations>
+<Code Language="SQL">
+<![CDATA[WITH hierarchy($column_list$)
+AS
+(
+	SELECT $root_columns$
+	FROM $table_1$
+	WHERE $parent_id$ IS NULL
+	UNION ALL
+	SELECT $child_columns$
+	FROM $table_2$ AS children
+		JOIN Hierarchy AS root ON root.$hierarchy_id_1$ = children.$child_id$
+)
+SELECT *
+FROM hierarchy
+WHERE $hierarchy_id_2$ = $target_id$;
+]]>
+</Code>
+</Snippet>
+</CodeSnippet>
+</CodeSnippets>

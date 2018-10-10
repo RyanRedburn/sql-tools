@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+    <_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+   <_locTag _loc="locData">Default</_locTag>
+</_locDefinition>
+<CodeSnippet Format="1.0.0">
+<Header>
+	<Title>SimpleTransaction</Title>
+	<Shortcut></Shortcut>
+	<Description>A basic TRY/CATCH transaction template.</Description>
+	<Author>Ryan Redburn</Author>
+	<SnippetTypes>
+		<SnippetType>SurroundsWith</SnippetType>
+	</SnippetTypes>
+</Header>
+<Snippet>
+<Code Language="SQL">
+<![CDATA[BEGIN TRY
+	SET NOCOUNT, XACT_ABORT ON;
+
+	BEGIN TRAN;
+
+	$selected$$end$
+
+	COMMIT TRAN;
+
+	SET NOCOUNT, XACT_ABORT OFF;
+END TRY
+BEGIN CATCH
+	ROLLBACK TRAN;
+
+	SET NOCOUNT, XACT_ABORT OFF;
+END CATCH]]>
+</Code>
+</Snippet>
+</CodeSnippet>
+</CodeSnippets>
