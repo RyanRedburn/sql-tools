@@ -3,14 +3,14 @@
 SET NOCOUNT ON;
 
 --Physical statistics for indexes on user tables.
-SELECT t.[name] AS table_name, i.[name] AS index_name, i.index_id, index_type_desc, index_level, page_count,
-	record_count, ghost_record_count, version_ghost_record_count, avg_page_space_used_in_percent, avg_fragmentation_in_percent
+SELECT t.[name] AS table_name, i.[name] AS index_name, i.index_id, ips.index_type_desc, ips.index_level, ips.page_count,
+	ips.record_count, ips.ghost_record_count, ips.version_ghost_record_count, ips.avg_page_space_used_in_percent, ips.avg_fragmentation_in_percent
 FROM sys.dm_db_index_physical_stats(DB_ID(), NULL, NULL, NULL, N'SAMPLED') AS ips
 	JOIN sys.indexes AS i ON i.[object_id] = ips.[object_id]
 		AND i.index_id = ips.index_id
 	JOIN sys.tables AS t ON t.[object_id] = i.[object_id]
 WHERE t.[type] = 'U'
-ORDER BY t.[name], i.index_id, index_level;
+ORDER BY t.[name], i.index_id, ips.index_level;
 
 --Total space used by table/index type.
 SELECT i.[type_desc] AS index_type, COUNT(i.[object_id]) AS object_count, (SUM(s.used_page_count) * 8) / 1024 AS space_used_in_mb
