@@ -2,16 +2,6 @@
 
 SET NOCOUNT ON;
 
---Index usage statistics (excluding clustered indexes).
-SELECT o.[name] AS table_name, i.[name] AS index_name, i.[type_desc] AS index_type_desc, us.user_seeks, us.user_scans,
-	us.user_updates, us.last_user_seek, us.last_user_scan, us.last_user_update
-FROM sys.indexes AS i
-	JOIN sys.dm_db_index_usage_stats AS us ON us.index_id = i.index_id
-		AND us.[object_id] = i.[object_id]
-	JOIN sys.objects AS o ON o.[object_id] = i.[object_id]
-WHERE i.[type] NOT IN (0, 1)
-	AND o.[type] <> 'S';
-
 --Physical statistics for indexes on user tables.
 SELECT t.[name] AS table_name, i.[name] AS index_name, i.index_id, index_type_desc, index_level, page_count,
 	record_count, ghost_record_count, version_ghost_record_count, avg_page_space_used_in_percent, avg_fragmentation_in_percent
@@ -31,6 +21,16 @@ FROM sys.dm_db_partition_stats AS s
 WHERE t.[type] = 'U'
 	AND t.is_ms_shipped = 0
 GROUP BY i.[type_desc];
+
+--Index usage statistics (excluding clustered indexes).
+SELECT o.[name] AS table_name, i.[name] AS index_name, i.[type_desc] AS index_type_desc, us.user_seeks, us.user_scans,
+	us.user_updates, us.last_user_seek, us.last_user_scan, us.last_user_update
+FROM sys.indexes AS i
+	JOIN sys.dm_db_index_usage_stats AS us ON us.index_id = i.index_id
+		AND us.[object_id] = i.[object_id]
+	JOIN sys.objects AS o ON o.[object_id] = i.[object_id]
+WHERE i.[type] NOT IN (0, 1)
+	AND o.[type] <> 'S';
 
 --Missing indexes.
 SELECT id.[statement], id.equality_columns, id.inequality_columns, id.included_columns, gs.unique_compiles,
