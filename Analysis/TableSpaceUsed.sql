@@ -22,4 +22,4 @@ SELECT s.[name] AS [schema_name], t.[name] AS table_name, r.table_type, r.row_co
 FROM result AS r
 	JOIN sys.tables AS t ON t.[object_id] = r.[object_id]
 	JOIN sys.schemas AS s ON s.[schema_id] = t.[schema_id]
-ORDER BY s.[name], t.[name];
+ORDER BY total_space_in_mb DESC;

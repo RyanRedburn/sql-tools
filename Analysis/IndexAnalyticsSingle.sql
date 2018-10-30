@@ -46,7 +46,8 @@ FROM sys.indexes AS i
 	JOIN sys.objects AS o ON o.[object_id] = i.[object_id]
 WHERE o.[type] <> 'S'
 	AND us.database_id = DB_ID(@database_name)
-	AND us.[object_id] = OBJECT_ID(@schema_name + N'.' + @table_name);
+	AND us.[object_id] = OBJECT_ID(@schema_name + N'.' + @table_name)
+ORDER BY o.[name], i.[name];
 
 --Missing index information
 SELECT id.index_handle, id.[statement], id.equality_columns, id.inequality_columns, id.included_columns, gs.unique_compiles,

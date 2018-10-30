@@ -20,7 +20,8 @@ FROM sys.dm_db_partition_stats AS s
 	JOIN sys.tables AS t ON t.[object_id] = i.[object_id]
 WHERE t.[type] = 'U'
 	AND t.is_ms_shipped = 0
-GROUP BY i.[type_desc];
+GROUP BY i.[type_desc]
+ORDER BY space_used_in_mb DESC;
 
 --Index usage statistics (excluding clustered indexes).
 SELECT o.[name] AS table_name, i.[name] AS index_name, i.[type_desc] AS index_type_desc, us.user_seeks, us.user_scans,
@@ -30,7 +31,8 @@ FROM sys.indexes AS i
 		AND us.[object_id] = i.[object_id]
 	JOIN sys.objects AS o ON o.[object_id] = i.[object_id]
 WHERE i.[type] NOT IN (0, 1)
-	AND o.[type] <> 'S';
+	AND o.[type] <> 'S'
+ORDER BY o.[name], i.[name];
 
 --Missing indexes.
 SELECT id.[statement], id.equality_columns, id.inequality_columns, id.included_columns, gs.unique_compiles,
