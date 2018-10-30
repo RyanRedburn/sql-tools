@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+<_locDefinition xmlns="urn:locstudio">
+	<_locDefault _loc="locNone" />
+    <_locTag _loc="locData">Title</_locTag>
+    <_locTag _loc="locData">Description</_locTag>
+    <_locTag _loc="locData">Author</_locTag>
+    <_locTag _loc="locData">ToolTip</_locTag>
+	<_locTag _loc="locData">Default</_locTag>
+</_locDefinition>
+<CodeSnippet Format="1.0.0">
+<Header>
+<Title>CarefulBatch</Title>
+<Shortcut></Shortcut>
+<Description>A template to use for designing high concurrency batch operations.</Description>
+<Author>Ryan Redburn</Author>
+<SnippetTypes>
+	<SnippetType>Expansion</SnippetType>
+</SnippetTypes>
+</Header>
+<Snippet>
+<Declarations>
+	<Literal>
+		<ID>value_1</ID>
+		<Default>value_1</Default>
+	</Literal>
+	<Literal>
+		<ID>value_2</ID>
+		<Default>value_2</Default>
+	</Literal>
+	<Literal>
+		<ID>value_3</ID>
+		<Default>value_3</Default>
+	</Literal>
+	<Literal>
+		<ID>value_4</ID>
+		<Default>value_4</Default>
+	</Literal>
+	<Literal>
+		<ID>value_5</ID>
+		<Default>value_5</Default>
+	</Literal>
+	<Literal>
+		<ID>table_1</ID>
+		<Default>table_1</Default>
+	</Literal>
+	<Literal>
+		<ID>table_2</ID>
+		<Default>table_2</Default>
+	</Literal>
+</Declarations>
+<Code Language="SQL">
+<![CDATA[DECLARE @largest_value_processed INT = -1,
+		@next_batch_max INT,
+		@row_count INT = 1;
+ 
+WHILE (@row_count > 0)
+BEGIN
+	SELECT TOP (1000) @next_batch_max = $value_1$
+	FROM $table_1$
+	WHERE $value_2$ > @largest_value_processed
+	ORDER BY $value_3$ ASC;
+ 
+	DELETE $table_2$
+	WHERE $value_4$ > @largest_value_processed
+		AND $value_5$ <= @next_batch_max;
+ 
+	SET @row_count = @@ROWCOUNT;
+	SET @largest_value_processed = @next_batch_max;
+END]]>
+</Code>
+</Snippet>
+</CodeSnippet>
+</CodeSnippets>
