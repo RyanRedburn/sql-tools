@@ -27,6 +27,7 @@ This project contains a variety of scripts and miscellaneous other items for use
 - GenerateColumnLists.sql - Generates multiple column lists (for use in insert statements, logic can be repurposed for dynamic pivots, etc.) for a given table with different formats.
 
 ### Snippet
+- CarefulBatch.snippet - Expansion snippet for designing high concurrency batch operations.
 - RecursiveHierachy.snippet - Expansion snippit for querying adjancy list style hierarchy tables.
 - SimpleCursor.snippet - Expansion snippet for a single variable, fast-forward cursor.
 - SimpleTransaction.snippet - SurroundsWith snippet for simple transaction management boilerplate.
