@@ -15,7 +15,8 @@ AS
 	WHERE t.[type] = 'U'
 		AND t.is_ms_shipped = 0
 		AND i.[type] IN (0, 1, 5)
-	GROUP BY t.[object_id], t.[schema_id], i.[type_desc])
+	GROUP BY t.[object_id], t.[schema_id], i.[type_desc]
+)
 SELECT s.[name] AS [schema_name], t.[name] AS table_name, r.table_type, r.row_count, r.partition_count,
 	r.total_space_in_mb, r.used_space_in_mb, r.unused_space_in_mb, t.lock_escalation_desc, t.is_replicated,
 	t.is_published, t.is_merge_published, t.is_sync_tran_subscribed, t.is_tracked_by_cdc, t.is_filetable
