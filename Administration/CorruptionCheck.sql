@@ -58,7 +58,7 @@ BEGIN TRY
 			PRINT (N'Command: ' + @command_base + N'<DatabaseName>'
 				+ CASE @run_full_check WHEN 1 THEN @command_options_full ELSE @command_options_simple END);
 
-		DECLARE db_cursor CURSOR FAST_FORWARD
+		DECLARE db_cursor CURSOR FORWARD_ONLY READ_ONLY STATIC LOCAL
 		FOR
 		SELECT [name] FROM #candidate;
 

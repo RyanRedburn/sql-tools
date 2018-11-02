@@ -116,7 +116,7 @@ BEGIN TRY
 
 		IF @run_as_simulation = 0
 		BEGIN
-			DECLARE db_cursor CURSOR FAST_FORWARD
+			DECLARE db_cursor CURSOR FORWARD_ONLY READ_ONLY STATIC LOCAL
 			FOR
 			SELECT [name] FROM #candidate;
 

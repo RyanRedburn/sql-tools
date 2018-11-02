@@ -40,7 +40,7 @@
 <Code Language="SQL">
 <![CDATA[DECLARE @cursor_variable $type$;
 
-DECLARE simple_cursor CURSOR FAST_FORWARD
+DECLARE simple_cursor CURSOR FORWARD_ONLY READ_ONLY STATIC LOCAL
 FOR
 SELECT $column$
 FROM $table$;

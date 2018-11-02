@@ -60,7 +60,7 @@ BEGIN TRY
 	DECLARE @index_name SYSNAME, @schema_name SYSNAME, @table_name SYSNAME, @operation TINYINT, @command NVARCHAR(300);
 
 	--Get candidate index set
-	DECLARE index_cursor CURSOR FAST_FORWARD
+	DECLARE index_cursor CURSOR FORWARD_ONLY READ_ONLY STATIC LOCAL
 	FOR
 	SELECT s.[name], t.[name], i.[name],
 		CASE WHEN ips.avg_fragmentation_in_percent >= @rebuild_bound OR @rebuild_all = 1 THEN 2
