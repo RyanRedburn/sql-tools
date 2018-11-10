@@ -37,6 +37,21 @@ IF @run_phys_stats_query = 1
 	FROM sys.dm_db_index_physical_stats(DB_ID(@database_name), OBJECT_ID(@schema_name + N'.' + @table_name), NULL, NULL, @sample_mode)
 	ORDER BY index_id, index_level;
 
+--Index operational stats
+SELECT DB_NAME(ios.database_id) AS [database_name], OBJECT_NAME(ios.[object_id]) AS table_name,
+	i.[name] AS index_name, i.index_id, ios.partition_number, ios.leaf_allocation_count,
+	ios.leaf_insert_count, ios.leaf_update_count, ios.leaf_delete_count,
+	ios.row_lock_count, ios.row_lock_wait_count,ios.row_lock_wait_in_ms,
+	ios.page_lock_count, ios.page_latch_wait_count, ios.page_lock_wait_in_ms,
+	ios.page_latch_wait_count, ios.page_latch_wait_in_ms, ios.page_io_latch_wait_count,
+	ios.page_io_latch_wait_in_ms
+FROM sys.dm_db_index_operational_stats(DB_ID(), OBJECT_ID(@schema_name + N'.' + @table_name), NULL, NULL) AS ios
+    JOIN sys.indexes AS i ON i.[object_id] = ios.[object_id]
+		AND i.index_id = ios.index_id
+	JOIN sys.objects AS o ON o.[object_id] = i.[object_id]
+WHERE o.is_ms_shipped = 0
+ORDER BY row_lock_wait_count DESC;
+
 --Index usage information
 SELECT i.index_id, i.[name] AS index_name, i.[type_desc] AS index_type_desc, us.user_seeks, us.user_scans,
 	us.user_updates, us.last_user_seek, us.last_user_scan, us.last_user_update
