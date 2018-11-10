@@ -1,3 +1,5 @@
+--NOTE: All indexes on a table are factored into the space numbers (e.g., total_space_used_in_mb, etc.).
+
 SET NOCOUNT ON;
 
 WITH result([object_id], [schema_id], table_type, row_count, partition_count)
@@ -28,7 +30,6 @@ AS
 		JOIN sys.allocation_units AS a ON a.container_id = ps.[partition_id]
 	WHERE t.[type] = 'U'
 		AND t.is_ms_shipped = 0
-		AND i.[type] IN (0, 1, 5)
 	GROUP BY t.[object_id], t.[schema_id]
 )
 SELECT s.[name] AS [schema_name], t.[name] AS table_name, r.table_type, r.row_count, r.partition_count,
