@@ -31,4 +31,4 @@ This project contains a variety of scripts and miscellaneous other items for use
 - RecursiveHierachy.snippet - Expansion snippit for querying adjancy list style hierarchy tables.
 - SimpleCursor.snippet - Expansion snippet for a single variable, fast-forward cursor.
 - SimpleTransaction.snippet - SurroundsWith snippet for simple transaction management boilerplate.
-- SnippetTemplate.txt - T-SQL snippet template (includes a link the the schema definition).
+- SnippetTemplate.txt - T-SQL snippet template (includes a link to the schema definition).
