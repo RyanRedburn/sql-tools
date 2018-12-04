@@ -11,7 +11,7 @@ SELECT TOP 10 qt.[text] AS query, qs.execution_count, qs.total_logical_reads, qs
 FROM sys.dm_exec_query_stats AS qs
 	CROSS APPLY sys.dm_exec_sql_text(qs.[sql_handle]) AS qt
 	CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) AS qp
-	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) as pa
+	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) AS pa
 WHERE pa.attribute = N'dbid'
 	AND pa.[value] = @databaseId
 ORDER BY qs.total_logical_reads DESC;
@@ -24,7 +24,7 @@ SELECT TOP 10 qt.[text] AS query, qs.execution_count, qs.total_logical_reads, qs
 FROM sys.dm_exec_query_stats AS qs
 	CROSS APPLY sys.dm_exec_sql_text(qs.[sql_handle]) AS qt
 	CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) AS qp
-	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) as pa
+	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) AS pa
 WHERE pa.attribute = N'dbid'
 	AND pa.[value] = @databaseId
 ORDER BY qs.total_logical_writes DESC;
@@ -37,7 +37,7 @@ SELECT TOP 10 qt.[text] AS query, qs.execution_count, qs.total_logical_reads, qs
 FROM sys.dm_exec_query_stats AS qs
 	CROSS APPLY sys.dm_exec_sql_text(qs.[sql_handle]) AS qt
 	CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) AS qp
-	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) as pa
+	CROSS APPLY sys.dm_exec_plan_attributes(qs.plan_handle) AS pa
 WHERE pa.attribute = N'dbid'
 	AND pa.[value] = @databaseId
 ORDER BY qs.total_worker_time DESC;
