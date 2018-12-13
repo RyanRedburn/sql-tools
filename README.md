@@ -22,6 +22,9 @@ This project contains a variety of scripts and miscellaneous other items for use
 - StatsInfo.sql - Gets statistics info for a given database.
 - TableSpaceUsed.sql - Gets the physical space used per user table.
 
+### Documents
+- DatabaseAdministration.docx - A document outlining what I consider to be important topical areas to examine when performing database administration. This is a living document and should not be evaluated as a comprehensive guide to database administration.
+
 ### Misc
 - QueryShortcuts.sql - Miscellaneous queries that are useful as query shortcuts.
 - GenerateColumnLists.sql - Generates multiple column lists (for use in insert statements, logic can be repurposed for dynamic pivots, etc.) for a given table with different formats.
