@@ -81,11 +81,11 @@ if ($scanAll) {
 }
 
 if ($null -eq $instances) {
-	Write-Host "No instances found/scanned. This is either due to an error or no instances were found during script execution when the option to scan all instances was chosen."
+	Write-Host "No instances found/scanned. Either an error was encountered or no instances were found during script execution when the option to scan all instances was chosen."
 	exit
 }
 
-# Perform general and vulnerability scans for all SQL Server instances and databases on the currrent machine.
+# Perform general and vulnerability scans for all/select SQL Server instances and databases on the currrent machine.
 $instances | ForEach-Object {
 	$instance = Get-SqlInstance $_
 
@@ -94,17 +94,35 @@ $instances | ForEach-Object {
 		$instanceCreds = Get-Credential -Message ("Provide the SQL Server credentials for the following instance: " + $instance.Name)
 	}
 	
-	$instance | Invoke-SqlAssessment | Out-File -FilePath ($path + $instance.InstanceName + "_GeneralAssessment.txt")
+	# Instance scan
+	try {
+		Write-Host ("Executing general assessment scan for instance: " + $instance.InstanceName)
+		$instance | Invoke-SqlAssessment -ErrorAction Stop | Out-File -FilePath ($path + $instance.InstanceName + "_GeneralAssessment.txt") -ErrorAction Stop
+	}
+	catch {
+		Write-Host ("Scan execution failed for instance: " + $instance.InstanceName)
+		Write-Host $_
+		continue
+	}
 
+	# Database scans
 	Get-SqlDatabase -ServerInstance $instance.Name | ForEach-Object {
-		Invoke-SqlAssessment $_ | Out-File -FilePath ($path + $generalDirectory + $instance.InstanceName + "_" + $_.Name + "_GeneralAssessment.txt")
+		try {
+			Write-Host ("Executing general assessment scan for database: " + $instance.InstanceName + "\" + $_.Name)
+			Invoke-SqlAssessment $_ -ErrorAction Stop | Out-File -FilePath ($path + $generalDirectory + $instance.InstanceName + "_" + $_.Name + "_GeneralAssessment.txt") -ErrorAction Stop
 
-		$vulnScan = $null
-		if ($prompt) {
-			$vulnScan = Invoke-SqlVulnerabilityAssessmentScan -ServerInstance $instance -DatabaseName $_.Name -Credential $instanceCreds
-		} else {
-			$vulnScan = Invoke-SqlVulnerabilityAssessmentScan -ServerInstance $instance -DatabaseName $_.Name
+			Write-Host ("Executing vulnerability assessment scan for database: " + $instance.InstanceName + "\" + $_.Name)
+			$vulnScan = $null
+			if ($prompt) {
+				$vulnScan = Invoke-SqlVulnerabilityAssessmentScan -ServerInstance $instance -DatabaseName $_.Name -Credential $instanceCreds -ErrorAction Stop
+			} else {
+				$vulnScan = Invoke-SqlVulnerabilityAssessmentScan -ServerInstance $instance -DatabaseName $_.Name -ErrorAction Stop
+			}
+			$vulnScan | Export-SqlVulnerabilityAssessmentScan -FolderPath ($path + $vulnDirectory + $instance.InstanceName + "_" + $_.Name + "_VulnerabilityAssessment.xlsx") -ErrorAction Stop
 		}
-		$vulnScan | Export-SqlVulnerabilityAssessmentScan -FolderPath ($path + $vulnDirectory + $instance.InstanceName + "_" + $_.Name + "_VulnerabilityAssessment.xlsx")
+		catch {
+			Write-Host ("Scan execution failed for database: " + $instance.InstanceName + "\" + $_.Name)
+			Write-Host $_
+		}
 	}
 }

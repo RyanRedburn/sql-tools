@@ -9,7 +9,10 @@ This project contains a variety of scripts and miscellaneous other items for use
 - ChangeDatabaseOptions.sql - Changes various options (recovery model, compatibility, etc.) of one or more databases.
 - CorruptionCheck.sql - Check for database corruption on a user selected set of databases.
 - IndexMaintenance.sql - Rebuilds/reorganizes database indexes based on user configured parameters.
-- SqlServerAssessment.ps1 - Runs the Microsoft SQL Server General and Vulnerability assessments for all/select instances and databases (as relevant) on the current machine. The script will prompt the user for various options when run. Note that assessment results are Microsoft's recommendations and users' should exercise discretion when determining action items. 
+- SqlServerAssessment.ps1 - Runs the Microsoft SQL Server General and Vulnerability assessments for all/select instances and databases (as applicable) on the current machine. Note that assessment results are Microsoft's recommendations and users' should exercise discretion when determining action items.
+    - The script will prompt the user for various options when run.
+    - Scans will fail for offline instances. This does not impact overall script execution.
+    - The default instance name will be blank. Console output and scan results without an instance prefix belong to the default instance.
 
 ### Analysis
 - BackupHistory.sql - Gets the backup history for a given database.
