@@ -8,6 +8,7 @@ This project contains a variety of scripts and miscellaneous other items for use
 ### Adminstration
 - ChangeDatabaseOptions.sql - Changes various options (recovery model, compatibility, etc.) of one or more databases.
 - CorruptionCheck.sql - Check for database corruption on a user selected set of databases.
+- ForEachDb.sql - Runs a given operation for the specified databases.
 - IndexMaintenance.sql - Rebuilds/reorganizes database indexes based on user configured parameters.
 - SqlServerAssessment.ps1 - Runs the Microsoft SQL Server General and Vulnerability assessments for all/select instances and databases (as applicable) on the current machine. Note that assessment results are Microsoft's recommendations and users' should exercise discretion when determining action items.
     - The script will prompt the user for various options when run.
