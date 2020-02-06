@@ -1,4 +1,4 @@
---NOTE: Changing a database recovery model will break the backup chain.
+--NOTE: Changing a database's recovery model will break the backup chain.
 
 USE [master];
 
@@ -34,7 +34,7 @@ BEGIN TRY
 	DECLARE @option_error BIT = 0;
 
 	--Validate user options
-	IF @compat_level NOT IN (-1, 80, 90, 100, 110, 120, 130, 140)
+	IF @compat_level NOT IN (-1, 80, 90, 100, 110, 120, 130, 140, 150)
 	BEGIN
 		PRINT (N'Invalid compatibility level specified.');
 		SET @option_error = 1;
@@ -165,7 +165,7 @@ BEGIN CATCH
 
 	IF @run_as_simulation = 0
 	BEGIN
-		DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('global', 'db_cursor'));
+		DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('local', 'db_cursor'));
 		IF @status = 1
 		BEGIN
 			CLOSE db_cursor;

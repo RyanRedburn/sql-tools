@@ -147,7 +147,7 @@ BEGIN CATCH
 		+ N', Line ' + COALESCE(CAST(ERROR_LINE() AS NVARCHAR(10)), N'')
 		+ N', ' + COALESCE(ERROR_MESSAGE(), N''));
 
-	DECLARE @cursor_status SMALLINT = (SELECT CURSOR_STATUS(N'global', N'index_cursor'));
+	DECLARE @cursor_status SMALLINT = (SELECT CURSOR_STATUS(N'local', N'index_cursor'));
 	IF @cursor_status = 1
 	BEGIN
 		CLOSE index_cursor;

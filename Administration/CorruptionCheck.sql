@@ -113,7 +113,7 @@ BEGIN CATCH
 		+ N', Line ' + COALESCE(CAST(ERROR_LINE() AS NVARCHAR(10)), N'')
 		+ N', ' + COALESCE(ERROR_MESSAGE(), N''));
 
-	DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('global', 'db_cursor'));
+	DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('local', 'db_cursor'));
 	IF @status = 1
 	BEGIN
 		CLOSE db_cursor;
