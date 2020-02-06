@@ -19,6 +19,7 @@ This project contains a variety of scripts and miscellaneous other items for use
 - BackupHistory.sql - Gets the backup history for a given database.
 - DatabaseAndFileState.sql - Get state information for all databases and database files on a given server.
 - DefaultPaths.sql - Gets the default paths (e.g., data, log, etc.) for a database engine instance.
+- EstimateIndexSize.sql - Generates size estimates for nonclustered indexes.
 - FindWaits.sql - Gets waiting queries with detail info.
 - GetPlanDetailsForProc.sql - Gets execution plan(s) and session options for said plans for a given procedure.
 - IndexAnalyticsMulti.sql - Gets info (fragmentation, size, missing indexes, etc.) about a given database's indexes.
