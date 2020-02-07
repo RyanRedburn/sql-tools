@@ -20,3 +20,5 @@ SELECT @master_log = SUBSTRING(@master_log, 3, 255);
 SELECT @master_log = SUBSTRING(@master_log, 1, LEN(@master_log) - CHARINDEX('\', REVERSE(@master_log)));
 
 SELECT COALESCE(@default_data, @master_data) AS default_data, COALESCE(@default_log, @master_log) AS default_log, COALESCE(@default_backup, @master_log) AS default_backup;
+
+SET NOCOUNT OFF;

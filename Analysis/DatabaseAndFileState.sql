@@ -29,3 +29,5 @@ FROM sys.master_files AS mf
 	JOIN sys.dm_io_virtual_file_stats(NULL, NULL) AS vfs ON vfs.database_id = mf.database_id
 		AND vfs.[file_id] = mf.[file_id]
 ORDER BY d.[name], mf.[file_id];
+
+SET NOCOUNT OFF;

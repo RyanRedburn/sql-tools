@@ -16,3 +16,5 @@ FROM sys.objects AS o
 	CROSS APPLY sys.dm_exec_plan_attributes(s.plan_handle) AS a
 WHERE o.[object_id] = OBJECT_ID(@proc_name)
 ORDER BY o.[object_id], s.plan_handle, a.attribute;
+
+SET NOCOUNT OFF;

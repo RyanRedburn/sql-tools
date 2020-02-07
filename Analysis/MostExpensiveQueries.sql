@@ -41,3 +41,5 @@ FROM sys.dm_exec_query_stats AS qs
 WHERE pa.attribute = N'dbid'
 	AND pa.[value] = @databaseId
 ORDER BY qs.total_worker_time DESC;
+
+SET NOCOUNT OFF;

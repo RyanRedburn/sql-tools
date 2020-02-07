@@ -7,3 +7,5 @@ FROM sys.dm_exec_requests AS req
 	CROSS APPLY sys.dm_exec_sql_text(req.[sql_handle]) AS sqltext
 	JOIN sys.dm_exec_sessions AS ses ON ses.session_id = req.session_id
 WHERE req.wait_type IS NOT NULL;
+
+SET NOCOUNT OFF;

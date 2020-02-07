@@ -57,3 +57,5 @@ FROM sys.dm_db_missing_index_details AS id
 	JOIN sys.dm_db_missing_index_group_stats AS gs ON gs.group_handle = ig.index_group_handle
 WHERE id.database_id = DB_ID()
 ORDER BY gs.avg_total_user_cost DESC, gs.avg_user_impact DESC;
+
+SET NOCOUNT OFF;

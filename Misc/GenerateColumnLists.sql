@@ -8,8 +8,8 @@ DECLARE @schema_name SYSNAME = N'dbo',
 		@merge_source_qualifier NVARCHAR(25) = N'';
 
 DECLARE @quoted_with_spaces NVARCHAR(MAX), @quoted_no_spaces NVARCHAR(MAX),
-	@not_quoted_with_spaces NVARCHAR(MAX), @not_quoted_no_spaces NVARCHAR(MAX),
-	@merge_update_quoted NVARCHAR(MAX), @merge_update_not_quoted NVARCHAR(MAX);
+		@not_quoted_with_spaces NVARCHAR(MAX), @not_quoted_no_spaces NVARCHAR(MAX),
+		@merge_update_quoted NVARCHAR(MAX), @merge_update_not_quoted NVARCHAR(MAX);
 
 SELECT @quoted_with_spaces = COALESCE(@quoted_with_spaces + N', ', N'') + @column_qualifier + QUOTENAME(c.[name]),
 	@quoted_no_spaces = COALESCE(@quoted_no_spaces + N',', N'') + @column_qualifier + QUOTENAME(c.[name]),
@@ -33,3 +33,5 @@ FROM (VALUES
 	(N'Not Quoted/No Spaces', @not_quoted_no_spaces),
 	(N'Merge Update/Quoted', @merge_update_quoted),
 	(N'Merge Update/Not Quoted', @merge_update_not_quoted)) AS t(output_type, content);
+
+SET NOCOUNT OFF;

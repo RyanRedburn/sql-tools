@@ -73,3 +73,5 @@ FROM sys.dm_db_missing_index_details AS id
 WHERE id.database_id = DB_ID()
 	AND id.[object_id] = OBJECT_ID(@schema_name + N'.' + @table_name)
 ORDER BY gs.avg_total_user_cost DESC, gs.avg_user_impact DESC;
+
+SET NOCOUNT OFF;

@@ -6,3 +6,5 @@ FROM sys.tables AS t
 	JOIN sys.stats AS s ON s.[object_id] = t.[object_id]
 	CROSS APPLY sys.dm_db_stats_properties(s.[object_id], s.stats_id) AS sp
 ORDER BY t.[name], s.[name];
+
+SET NOCOUNT OFF;

@@ -40,3 +40,5 @@ FROM result AS r
 	JOIN sys.tables AS t ON t.[object_id] = r.[object_id]
 	JOIN sys.schemas AS s ON s.[schema_id] = t.[schema_id]
 ORDER BY total_space_in_mb DESC;
+
+SET NOCOUNT OFF;

@@ -5,3 +5,5 @@ SELECT s.database_name, s.backup_start_date, s.backup_finish_date, s.recovery_mo
 FROM msdb.dbo.backupset AS s
 	INNER JOIN msdb.dbo.backupmediafamily AS m ON s.media_set_id = m.media_set_id
 ORDER BY s.database_name, s.backup_start_date DESC;
+
+SET NOCOUNT OFF;
