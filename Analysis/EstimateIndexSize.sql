@@ -1,5 +1,6 @@
 --NOTE: This operation runs in the current database context
 --NOTE: Estimates are only available/accurate for nonclustered indexes (exluding columnstore)
+--NOTE: Estimates tend to be slightly high
 --NOTE: Add the desired index columns in the VALUES clause of the INSERT statement on line 26
 
 SET NOCOUNT ON;
@@ -178,36 +179,38 @@ BEGIN
     SET @max_var_key_size = @max_var_key_size + 8;
 END;
 
-SET @var_key_size = 2 + (@num_var_key_columns * 2) + @max_var_key_size;
+--NOTE: Casts to NUMERIC are done to preserve fractional numbers (needed for accuracy)
+
+SET @var_key_size = CASE WHEN @num_var_key_columns > 0 THEN 2 + (@num_var_key_columns * 2) + @max_var_key_size ELSE 0 END;
 SET @non_leaf_row_size = @fixed_key_size + @var_key_size + @key_null_bitmap + 7;
 SET @non_leaf_rows_per_page = 8096 / (@non_leaf_row_size + 2);
-SET @free_rows_per_non_leaf_page = 8096 * ((100 - @fill_factor) / 100) / (@non_leaf_row_size + 2);
+SET @free_rows_per_non_leaf_page = CASE WHEN @pad_index = 1 THEN 8096 * ((100 - CAST(@fill_factor AS NUMERIC)) / 100) / (@non_leaf_row_size + 2) ELSE 0 END;
 
-SET @var_leaf_size = 2 + (@num_leaf_colummns * 2) + @max_var_leaf_size;
+SET @var_leaf_size = CASE WHEN @num_var_leaf_columns > 0 THEN 2 + (@num_leaf_colummns * 2) + @max_var_leaf_size ELSE 0 END;
 SET @leaf_row_size = @fixed_leaf_size + @var_leaf_size + @leaf_null_bitmap + 7;
 SET @leaf_rows_per_page = 8096 / (@leaf_row_size + 2);
-SET @free_rows_per_leaf_page = 8096 * ((100 - @fill_factor) / 100) / (@leaf_row_size + 2);
+SET @free_rows_per_leaf_page = 8096 * ((100 - CAST(@fill_factor AS NUMERIC)) / 100) / (@leaf_row_size + 2);
 
 --Calculate index size estimate
 DECLARE @non_leaf_space_used BIGINT, @leaf_space_used BIGINT, @num_non_leaf_pages BIGINT, @num_leaf_pages BIGINT, @non_leaf_levels INT;
 
-SET @num_leaf_pages = @row_count / (@leaf_rows_per_page - @free_rows_per_leaf_page);
-IF @num_leaf_pages = 0 AND @row_count > 0
-    SET @num_leaf_pages = 1
+SET @num_leaf_pages = CEILING(CAST(@row_count AS NUMERIC) / (@leaf_rows_per_page - @free_rows_per_leaf_page));
 SET @leaf_space_used = 8192 * @num_leaf_pages;
 
-SET @non_leaf_levels = 1 + LOG(@non_leaf_rows_per_page) * (@num_leaf_pages / @non_leaf_rows_per_page);
+SET @non_leaf_levels = CEILING(1 + LOG(@non_leaf_rows_per_page) / (@num_leaf_pages / @non_leaf_rows_per_page));
 
 DECLARE @level_counter INT = 1;
 WHILE @level_counter <= @non_leaf_levels
 BEGIN
-    SET @num_non_leaf_pages = COALESCE(@num_non_leaf_pages, 0) + (@num_leaf_pages / POWER(@non_leaf_rows_per_page, @level_counter));
+    SET @num_non_leaf_pages = COALESCE(@num_non_leaf_pages, 0) + CEILING((@num_leaf_pages / POWER(CAST(@non_leaf_rows_per_page AS NUMERIC), @level_counter)));
     SET @level_counter = @level_counter + 1;
 END;
 
 SET @non_leaf_space_used = 8192 * @num_non_leaf_pages;
 
-SELECT @leaf_space_used + @non_leaf_space_used AS EstimatedIndexSpaceInBytes;
+DECLARE @estimate_in_bytes NUMERIC = @leaf_space_used + @non_leaf_space_used;
+SELECT @estimate_in_bytes AS EstimatedIndexSpaceInBytes, estimate_in_bytes / 1024 AS EstimatedIndexSpaceInKB,
+    estimate_in_bytes / POWER(1024, 2) AS EstimatedIndexSpaceInMB, estimate_in_bytes / POWER(1024, 3) AS EstimatedIndexSpaceInGB;
 
 DROP TABLE #index_column;
 
