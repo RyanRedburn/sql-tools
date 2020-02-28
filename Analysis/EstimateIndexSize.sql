@@ -11,22 +11,27 @@ SET NOCOUNT ON;
 -- @fill_factor - This should match the fill factor setting for the target database
 -- @pad_index - This should match the pad index setting for the target database
 -- @row_count_override - This can be used to create the estimate with a simulated row count (must be greater than zero)
+-- @generate_create_statement - Whether or not the script should generate a CREATE INDEX statement based on the given paramters
+-- @new_index_name - The index name that will be used for the CREATE INDEX statement, if @generate_create_statement is set to 1
 DECLARE @table_name SYSNAME = N'',
         @table_schema SYSNAME = N'dbo',
         @index_is_unique BIT = 0,
         @fill_factor TINYINT = 100,
         @pad_index BIT = 0,
-        @row_count_override BIGINT = -1;
+        @row_count_override BIGINT = -1,
+        @generate_create_statement BIT = 1,
+        @new_index_name SYSNAME = N'';
 
 IF (SELECT OBJECT_ID('tempdb..#index_column')) IS NOT NULL
 	DROP TABLE #index_column;
 
-CREATE TABLE #index_column([name] SYSNAME NOT NULL, is_key_column BIT NOT NULL);
+CREATE TABLE #index_column([name] SYSNAME NOT NULL, is_key_column BIT NOT NULL, is_clustering_column BIT NOT NULL);
 
 --NOTE: If creating a nonclustered index over a clustered index all clustering key columns are included whether or not the user specifies them.
 --For this reason, all clustering key columns must be included in the list below (and marked as key columns) for the estimate to be accurate.
-INSERT #index_column([name], is_key_column)
-VALUES (N'', 1); --Add index columns
+--NOTE: Clustering columns must be marked as such to be excluded from the create index statement.
+INSERT #index_column([name], is_key_column, is_clustering_column)
+VALUES (N'', 1, 0); --Add index columns
 
 DECLARE @columns_specified INT, @columns_found INT;
 
@@ -197,7 +202,7 @@ DECLARE @non_leaf_space_used BIGINT, @leaf_space_used BIGINT, @num_non_leaf_page
 SET @num_leaf_pages = CEILING(CAST(@row_count AS NUMERIC) / (@leaf_rows_per_page - @free_rows_per_leaf_page));
 SET @leaf_space_used = 8192 * @num_leaf_pages;
 
-SET @non_leaf_levels = CEILING(1 + LOG(@non_leaf_rows_per_page) / (@num_leaf_pages / @non_leaf_rows_per_page));
+SET @non_leaf_levels = CEILING(1 + LOG(@non_leaf_rows_per_page) / CEILING(CAST(@num_leaf_pages AS NUMERIC) / @non_leaf_rows_per_page));
 
 DECLARE @level_counter INT = 1;
 WHILE @level_counter <= @non_leaf_levels
@@ -209,8 +214,27 @@ END;
 SET @non_leaf_space_used = 8192 * @num_non_leaf_pages;
 
 DECLARE @estimate_in_bytes NUMERIC = @leaf_space_used + @non_leaf_space_used;
-SELECT @estimate_in_bytes AS EstimatedIndexSpaceInBytes, estimate_in_bytes / 1024 AS EstimatedIndexSpaceInKB,
-    estimate_in_bytes / POWER(1024, 2) AS EstimatedIndexSpaceInMB, estimate_in_bytes / POWER(1024, 3) AS EstimatedIndexSpaceInGB;
+SELECT @estimate_in_bytes AS EstimatedIndexSpaceInBytes, @estimate_in_bytes / 1024 AS EstimatedIndexSpaceInKB,
+    @estimate_in_bytes / POWER(1024, 2) AS EstimatedIndexSpaceInMB, @estimate_in_bytes / POWER(1024, 3) AS EstimatedIndexSpaceInGB;
+
+IF @generate_create_statement = 1
+BEGIN
+    DECLARE @create_index_statement NVARCHAR(MAX) = N'CREATE NONCLUSTERED INDEX ' + @new_index_name + N' ON ' + @table_schema + N'.' + @table_name,
+            @key_columns NVARCHAR(MAX) = NULL,
+            @include_columns NVARCHAR(MAX) = NULL;
+
+    SELECT @key_columns = COALESCE(@key_columns + N', ', N'') + QUOTENAME([name])
+    FROM #index_column
+    WHERE is_key_column = 1
+        AND is_clustering_column = 0;
+
+    SELECT @include_columns = COALESCE(@include_columns + N', ', N'') + QUOTENAME([name])
+    FROM #index_column
+    WHERE is_key_column = 0
+        AND is_clustering_column = 0;
+
+    SELECT @create_index_statement + N'(' + @key_columns + N')' + CASE WHEN LEN(@include_columns) > 0 THEN N' INCLUDE (' + @include_columns + N');' ELSE N';' END;
+END
 
 DROP TABLE #index_column;
 
