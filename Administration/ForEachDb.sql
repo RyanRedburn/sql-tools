@@ -41,9 +41,10 @@ BEGIN TRY
 		FETCH NEXT FROM db_cursor
 		INTO @db_name;
 
+		--NOTE: A temp table created outside of the scope of the WHILE loop can be used to aggregate results across executions, if desired.
 		WHILE @@FETCH_STATUS = 0
 		BEGIN
-			EXEC (N'USE ' + @db_name + N'; '); --Operation
+			EXEC (N'USE [' + @db_name + N']; '); --Operation
 
 			FETCH NEXT FROM db_cursor
 			INTO @db_name;
