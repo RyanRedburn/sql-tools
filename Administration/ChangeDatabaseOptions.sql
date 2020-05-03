@@ -165,7 +165,7 @@ BEGIN CATCH
 
 	IF @run_as_simulation = 0
 	BEGIN
-		DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('local', 'db_cursor'));
+		DECLARE @status SMALLINT = (SELECT CURSOR_STATUS(N'local', N'db_cursor'));
 		IF @status = 1
 		BEGIN
 			CLOSE db_cursor;
@@ -175,7 +175,7 @@ BEGIN CATCH
 			DEALLOCATE db_cursor;
 	END
 
-	IF (SELECT OBJECT_ID('tempdb..#candidate')) IS NOT NULL
+	IF (SELECT OBJECT_ID(N'tempdb..#candidate')) IS NOT NULL
 		DROP TABLE #candidate;
 
 	SET NOCOUNT OFF;

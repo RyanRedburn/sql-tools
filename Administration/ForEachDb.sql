@@ -65,7 +65,7 @@ BEGIN CATCH
 		+ N', Line ' + COALESCE(CAST(ERROR_LINE() AS NVARCHAR(10)), N'')
 		+ N', ' + COALESCE(ERROR_MESSAGE(), N''));
 
-	DECLARE @status SMALLINT = (SELECT CURSOR_STATUS('local', 'db_cursor'));
+	DECLARE @status SMALLINT = (SELECT CURSOR_STATUS(N'local', N'db_cursor'));
 	IF @status = 1
 	BEGIN
 		CLOSE db_cursor;
@@ -74,7 +74,7 @@ BEGIN CATCH
 	ELSE IF @status = -1
 		DEALLOCATE db_cursor;
 
-	IF (SELECT OBJECT_ID('tempdb..#candidate')) IS NOT NULL
+	IF (SELECT OBJECT_ID(N'tempdb..#candidate')) IS NOT NULL
 		DROP TABLE #candidate;
 
 	SET NOCOUNT OFF;
