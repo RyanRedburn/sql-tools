@@ -32,6 +32,7 @@ This project contains a variety of scripts and miscellaneous other items for use
 - DatabaseAdministration.docx - A document outlining what I consider to be important topical areas to examine when performing database administration. This should not be considered a comprehensive guide to database administration.
 
 ### Misc
+- DatabaseTrace.sql - Creates an extended events session with a filter on database name. Captures events useful for analyzing operational workloads (e.g., RCPs, SQL batches, locks, ect.).
 - QueryShortcuts.sql - Miscellaneous queries that are useful as query shortcuts.
 - GenerateColumnLists.sql - Generates multiple column lists (for use in insert statements, logic can be repurposed for dynamic pivots, etc.) for a given table with different formats.
 
