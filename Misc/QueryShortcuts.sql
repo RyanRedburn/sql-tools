@@ -12,6 +12,3 @@ WITH database_size(database_id, size_in_mb_excluding_fs) AS (SELECT DISTINCT dat
 
 --Get basic server/instance information
 SELECT si.sqlserver_start_time, si.virtual_machine_type_desc, si.cpu_count, si.affinity_type_desc, CAST((sm.total_physical_memory_kb / 1048576.00) AS DECIMAL(7, 2)) AS total_physical_memory_gb, CAST((sm.available_physical_memory_kb / 1048576.00) AS DECIMAL(7, 2)) AS available_physical_memory_gb FROM sys.dm_os_sys_info AS si, sys.dm_os_sys_memory AS sm; SELECT [name], [value] FROM sys.configurations WHERE [name] IN (N'max server memory (MB)', N'min server memory (MB)', N'min memory per query (KB)');
-
---Create an alter statement that can be used to terminate all connections to a database
-SELECT N'USE [master]; ALTER DATABASE [' + DB_NAME() + N'] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; ALTER DATABASE [' + DB_NAME() + N'] SET MULTI_USER;';
