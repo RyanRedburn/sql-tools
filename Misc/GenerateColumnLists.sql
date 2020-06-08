@@ -23,7 +23,8 @@ FROM sys.columns AS c
 	JOIN sys.schemas AS s ON s.[schema_id] = t.[schema_id]
 		OR s.[schema_id] = v.[schema_id]
 WHERE s.[name] = @schema_name
-	AND (t.[name] = @object_name OR v.[name] = @object_name);
+	AND (t.[name] = @object_name OR v.[name] = @object_name)
+ORDER BY c.column_id;
 
 SELECT output_type, content
 FROM (VALUES
