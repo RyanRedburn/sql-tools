@@ -18,48 +18,43 @@ DECLARE @file_target NVARCHAR(MAX) =
     THEN N'ADD TARGET package0.event_file(SET filename=N''' + @file_path + N''',max_file_size=(' + CAST(@max_file_size AS NVARCHAR(10)) + N'),max_rollover_files=(' + CAST(@max_rollover_files AS NVARCHAR(10)) + N'))'
     ELSE N'' END;
 
+DECLARE @database_id SMALLINT = DB_ID(@database_name);
+
 DECLARE @start_events NVARCHAR(MAX) =
     CASE WHEN @include_start_events = 1
     THEN
         N'ADD EVENT sqlserver.rpc_starting(
-            ACTION(package0.event_sequence,sqlserver.database_name,sqlserver.plan_handle,sqlserver.session_id,sqlserver.username)
-            WHERE (([package0].[equal_boolean]([sqlserver].[is_system],(0))) AND ([sqlserver].[database_name]=N''' + @database_name + N'''))),
+            ACTION(sqlserver.database_id,sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
+            WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
         ADD EVENT sqlserver.sql_batch_starting(
-            ACTION(package0.event_sequence,sqlserver.database_name,sqlserver.plan_handle,sqlserver.session_id,sqlserver.username)
-            WHERE (([package0].[equal_boolean]([sqlserver].[is_system],(0))) AND ([sqlserver].[database_name]=N''' + @database_name + N'''))),'
+            ACTION(sqlserver.database_id,sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
+            WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),'
     ELSE N'' END;
 
-EXEC (N'
+DECLARE @sql NVARCHAR(MAX) = N'
 IF EXISTS (SELECT [name] FROM sys.server_event_sessions WHERE [name] = N''' + @session_name + N''')
 	DROP EVENT SESSION ' + @session_name + N' ON SERVER;
 
 CREATE EVENT SESSION [' + @session_name + N'] ON SERVER '
 + @start_events
-+ N'ADD EVENT sqlserver.excessive_non_grant_memory_used(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
-ADD EVENT sqlserver.existing_connection(
-    ACTION(package0.event_sequence,sqlserver.database_name,sqlserver.plan_handle,sqlserver.session_id,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
-ADD EVENT sqlserver.lock_deadlock(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
++ N'ADD EVENT sqlserver.lock_deadlock(
+    ACTION(sqlserver.plan_handle,sqlserver.username)
+    WHERE ([sqlserver].[database_id]=' + CAST(@database_id AS NVARCHAR) + N')),
 ADD EVENT sqlserver.lock_deadlock_chain(
     ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
-ADD EVENT sqlserver.long_io_detected(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
+    WHERE ([database_id]=' + CAST(@database_id AS NVARCHAR) + N')),
 ADD EVENT sqlserver.rpc_completed(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
+    ACTION(sqlserver.database_id,sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
     WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
 ADD EVENT sqlserver.sql_batch_completed(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
+    ACTION(sqlserver.database_id,sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
     WHERE ([sqlserver].[database_name]=N''' + @database_name + N''')),
-ADD EVENT sqlserver.xml_deadlock_report(
-    ACTION(sqlserver.database_name,sqlserver.plan_handle,sqlserver.username)
-    WHERE ([sqlserver].[database_name]=N''' + @database_name + N'''))'
+ADD EVENT sqlserver.database_xml_deadlock_report(
+    ACTION(sqlserver.database_id,sqlserver.plan_handle,sqlserver.username)
+    WHERE ([database_name]=N''' + @database_name + N'''))'
 + @file_target
 + N'WITH (MAX_MEMORY=8192 KB,EVENT_RETENTION_MODE=ALLOW_SINGLE_EVENT_LOSS,MAX_DISPATCH_LATENCY=5 SECONDS,MAX_EVENT_SIZE=0 KB,MEMORY_PARTITION_MODE=PER_CPU,TRACK_CAUSALITY=ON,STARTUP_STATE=OFF);
-');
+';
+
+EXEC (@sql);
 GO
