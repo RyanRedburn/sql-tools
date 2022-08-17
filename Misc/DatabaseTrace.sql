@@ -37,7 +37,10 @@ IF EXISTS (SELECT [name] FROM sys.server_event_sessions WHERE [name] = N''' + @s
 
 CREATE EVENT SESSION [' + @session_name + N'] ON SERVER '
 + @start_events
-+ N'ADD EVENT sqlserver.lock_deadlock(
++ N'ADD EVENT sqlserver.error_reported(
+    ACTION(sqlserver.database_id,sqlserver.database_name,sqlserver.plan_handle,sqlserver.sql_text,sqlserver.username)
+	WHERE ([sqlserver].[database_id]=' + CAST(@database_id AS NVARCHAR) + N')),
+ADD EVENT sqlserver.lock_deadlock(
     ACTION(sqlserver.plan_handle,sqlserver.username)
     WHERE ([sqlserver].[database_id]=' + CAST(@database_id AS NVARCHAR) + N')),
 ADD EVENT sqlserver.lock_deadlock_chain(
